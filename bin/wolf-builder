@@ -1,0 +1,41 @@
+#!/usr/bin/env node
+
+var program = require('commander')
+var actions = require('../lib/actions')
+
+function list(val) {
+  return val.split(',')
+}
+
+program.version(require('../package').version, '-v, --version')
+
+program
+  .command('rm <dir>')
+  .description('remove dir <dir>')
+  .action(actions.rm)
+
+program
+  .command('build <env>')
+  .description('build project <env>')
+  .option('-m, --modules <modules>', 'the build module', list)
+  .option('-d, --disable-uglify <disableUglify>', 'disable uglify')
+  .option('-c, --config-directory <configDirectory>', 'config directory, default: ./config/')
+  .action(actions.build)
+
+program
+  .command('buildLib <env>')
+  .description('build project <env>')
+  .option('-d, --disable-uglify <disableUglify>', 'disable uglify')
+  .option('-c, --config-directory <configDirectory>', 'config directory, default: ./config/')
+  .action(actions.buildLib)
+
+program
+  .command('dev')
+  .description('dev project')
+  .option('-f, --fast', 'dev project fast, not build lib')
+  .option('-m, --module <module>', 'the module dev local')
+  .option('-e, --env <env>', 'the dev env, default: local')
+  .option('-c, --config-directory <configDirectory>', 'config directory, default: ./config/')
+  .action(actions.dev)
+
+program.parse(process.argv)

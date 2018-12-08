@@ -1,0 +1,23 @@
+# c.
+.DS_STORE
+
+# Node.
+node_modules
+npm-debug.log*
+package-lock.json
+
+# yarn
+yarn-error.log
+
+# lerna
+lerna-debug.log
+
+# project
+lib
+typings
+es6
+es
+dist
+
+.idea/
+*.map
