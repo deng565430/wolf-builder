@@ -1,68 +1,59 @@
-import * as path from "path"
+import { resolve } from "path"
+import autoprefixer from 'autoprefixer'
+import commonLoaderRules from "./common"
+import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
 // 插件都是一个类，所以我们命名的时候尽量用大写开头
 import HtmlWebpackPlugin from "html-webpack-plugin"
 
 import ExtractTextWebpackPlugin from "extract-text-webpack-plugin"
-
 import CleanWebpackPlugin from "clean-webpack-plugin"
+
+// 插件都是一个类，所以我们命名的时候尽量用大写开头
 
 import webpack from "webpack"
 
-export default {
+module.exports = {
   entry: "./src/index.tsx", // 入口文件
   output: {
     filename: "bundle.js", // 打包后的文件名称
-    path: path.resolve("dist"), // 打包后的目录，必须是绝对路径
+    path: resolve("dist"), // 打包后的目录，必须是绝对路径
     chunkFilename: '[name].[hash].js',
   },
   resolve: {
-    // 别名
-    alias: {
-      $: "./src/jquery.js"
-    },
-    // 省略后缀
-    extensions: [".js", ".json", ".css"]
+    extensions: ['.webpack.js', '.ts', '.tsx', '.js', '.css', '.scss'],
   },
   module: {
-    rules: [
+    rules:[
+      ...commonLoaderRules,
       {
-        test: /\.(vue|js|jsx|tsx)/,
-        loader: 'eslint-loader',
-        exclude: /node_modules/,
-        enforce: 'pre'
-      },
-      {
-        test: /\.js$/,
-        use: "babel-loader",
-        include: /src/, // 只转化src目录下的js
-        exclude: /node_modules/ // 排除掉node_modules，优化打包速度
-      },
-      {
-        test: /\.css$/, // 解析css
-        use: ["style-loader", "css-loader", "postcss-loader"]
-      },
-      {
-        test: /\.(jpe?g|png|gif)$/,
+        test: /\.tsx?$/,
         use: [
           {
-            loader: "url-loader",
+            loader: 'ts-loader',
             options: {
-              limit: 8192, // 小于8k的图片自动转成base64格式，并且不会存在实体图片
-              outputPath: "images/" // 图片打包后存放的目录
+              transpileOnly: true
             }
           }
-        ]
+        ],
+        exclude: /node_modules/
       },
       {
-        test: /\.(htm|html)$/,
-        use: "html-withimg-loader"
-      },
-      {
-        test: /\.(eot|ttf|woff|svg)$/,
-        use: "file-loader"
+        test: /\.scss|.css$/,
+        use: [
+          { loader: 'style-loader', options: { sourceMap: true } },
+          { loader: 'css-loader', options: { sourceMap: true } },
+          {
+            loader: 'postcss-loader',
+            options: {
+              sourceMap: true,
+              plugins: () => [autoprefixer()],
+            },
+          },
+          { loader: 'resolve-url-loader', options: { sourceMap: true, keepQuery: true } }
+        ],
       }
     ]
-  }, // 处理对应模块
+  },
   // 提取公共代码
   optimization: {
     splitChunks: {
@@ -116,12 +107,5 @@ export default {
     // 拆分后会把css文件放到dist目录下的css/style.css
     new ExtractTextWebpackPlugin("css/style.css")
   ], // 对应的插件
-  devServer: {
-    contentBase: "./dist",
-    host: "localhost", // 默认是localhost
-    port: 3000, // 端口
-    open: true, // 自动打开浏览器
-    hot: true // 开启热更新
-  }, // 开发服务器配置
-  mode: "development" // 模式配置
+  mode: "production" // 生产模式
 };

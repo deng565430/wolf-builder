@@ -28,11 +28,22 @@
           }
         }
       ]
+    ],
+    "plugins": [
+      [
+        "import",
+        {
+          "libraryName": "antd",
+          "libraryDirectory": "es",
+          "style": "css"
+        }
+      ]
     ]
   },
   "dependencies": {
     "autoprefixer": "^9.4.2",
     "babel-cli": "^6.26.0",
+    "babel-plugin-import": "^1.11.0",
     "clean-webpack-plugin": "^1.0.0",
     "commander": "^2.19.0",
     "cross-spawn": "^6.0.5",

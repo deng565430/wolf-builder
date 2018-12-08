@@ -89,8 +89,6 @@ module.exports = {
     // 热替换，热替换不是刷新
     new webpack.HotModuleReplacementPlugin(),
     new TsconfigPathsPlugin({configFile: resolve(execDir, './tsconfig.json')}),
-    // 热替换，热替换不是刷新
-    new webpack.HotModuleReplacementPlugin(),
   ], // 对应的插件
   devServer: {
     contentBase: "./dist",
