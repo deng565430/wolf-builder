@@ -1,5 +1,4 @@
 export { default as clearConsole } from './clearConsole'
-export { default as openBrowser } from './openBrowser'
 export { default as getConfig, getSysConfig } from './getConfig'
 export { default as logExit } from './logExit'
 export { spawn, spawnSync, spawnSyncEx } from './spawn'
