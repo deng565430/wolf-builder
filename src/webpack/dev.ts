@@ -2,6 +2,10 @@ import { resolve } from "path"
 import autoprefixer from 'autoprefixer'
 import commonLoaderRules from "./common"
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
+// 插件都是一个类，所以我们命名的时候尽量用大写开头
+import HtmlWebpackPlugin from "html-webpack-plugin"
+
+import CleanWebpackPlugin from "clean-webpack-plugin"
 
 const execDir = process.cwd()
 
@@ -12,9 +16,8 @@ import webpack from "webpack"
 module.exports = {
   entry: "./src/index.ts", // 入口文件
   output: {
-    path: '/build/',
-    publicPath: '/',
-    filename: '[name].[hash].js',
+    filename: "bundle.js", // 打包后的文件名称
+    path: resolve("dist"), // 打包后的目录，必须是绝对路径
     chunkFilename: '[name].[hash].js',
   },
   module: {
@@ -76,11 +79,17 @@ module.exports = {
     }
   },
   plugins: [
-    // 打包前先清空
+    // 通过new一下这个类来使用插件
+    new HtmlWebpackPlugin({
+      // 用哪个html作为模板
+      // 在src目录下创建一个index.html页面当做模板来用
+      template: "./src/index.html"
+    }),
     // 热替换，热替换不是刷新
     new webpack.HotModuleReplacementPlugin(),
-    new TsconfigPathsPlugin({configFile: resolve(execDir, './tsconfig.json')})
-    // 通过new一下这个类来使用插件
+    new TsconfigPathsPlugin({configFile: resolve(execDir, './tsconfig.json')}),
+    // 热替换，热替换不是刷新
+    new webpack.HotModuleReplacementPlugin(),
   ], // 对应的插件
   devServer: {
     contentBase: "./dist",
