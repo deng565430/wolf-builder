@@ -14,15 +14,15 @@ export default async (env: string, options) => {
   }
 
   spawnSyncEx('node', [
-    join(projectDir, 'scripts/build'),
+    resolve(root, './node_modules/webpack/bin/webpack.js'),
     '--config',
-    JSON.stringify({
-      file:  resolve(projectDir, 'webpack/prod.js'),
-      isDev: false,
-      env,
-      modules,
-      disableUglify,
-      configDirectory,
-    }),
+    resolve(projectDir, 'webpack/prod.js'),
+    '--env.env',
+    env,
+    '--env.moduleName',
+    options.module,
+    '--env.configDirectory',
+    options.configDirectory
   ])
 }
+
