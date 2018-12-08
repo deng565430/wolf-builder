@@ -5,8 +5,6 @@ import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
 // 插件都是一个类，所以我们命名的时候尽量用大写开头
 import HtmlWebpackPlugin from "html-webpack-plugin"
 
-import CleanWebpackPlugin from "clean-webpack-plugin"
-
 const execDir = process.cwd()
 
 // 插件都是一个类，所以我们命名的时候尽量用大写开头
@@ -14,11 +12,14 @@ const execDir = process.cwd()
 import webpack from "webpack"
 
 module.exports = {
-  entry: "./src/index.ts", // 入口文件
+  entry: "./src/index.tsx", // 入口文件
   output: {
     filename: "bundle.js", // 打包后的文件名称
     path: resolve("dist"), // 打包后的目录，必须是绝对路径
     chunkFilename: '[name].[hash].js',
+  },
+  resolve: {
+    extensions: ['.webpack.js', '.ts', '.tsx', '.js', '.css', '.scss'],
   },
   module: {
     rules:[
