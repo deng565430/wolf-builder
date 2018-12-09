@@ -4,7 +4,7 @@ import commonLoaderRules from "./common"
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
 // 插件都是一个类，所以我们命名的时候尽量用大写开头
 import HtmlWebpackPlugin from "html-webpack-plugin"
-import tsImportPluginFactory from "ts-import-plugin"
+const tsImportPluginFactory = require('ts-import-plugin')
 
 const execDir = process.cwd()
 
