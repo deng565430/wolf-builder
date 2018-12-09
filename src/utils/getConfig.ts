@@ -41,7 +41,7 @@ const defaultConfig = {
   devPort: 8888,
   entry: './src/index.tsx',
   libAssetsName: 'lib-config.json',
-  projectAssetsName: 'sloth-config.json',
+  projectAssetsName: 'wolf-config.json',
   publicPath: '/',
   customWebpack: config => config
 }

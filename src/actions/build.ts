@@ -7,11 +7,11 @@ const projectDir = resolve(__dirname, '../')
 
 export default async (env: string, options) => {
   const { modules, disableUglify, configDirectory } = options
-  const cfg = getConfig(env, configDirectory)
+  // const cfg = getConfig(env, configDirectory)
 
-  if (cfg.libList) {
-    await buildLib(env, options, false)
-  }
+  // if (cfg.libList) {
+  //   await buildLib(env, options, false)
+  // }
 
   spawnSyncEx('node', [
     resolve(root, './node_modules/webpack/bin/webpack.js'),
