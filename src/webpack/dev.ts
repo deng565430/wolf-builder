@@ -80,6 +80,7 @@ module.exports = {
     }
   },
   plugins: [
+    ["import", { libraryName: "antd", style: "css" }],
     // 通过new一下这个类来使用插件
     new HtmlWebpackPlugin({
       // 用哪个html作为模板
