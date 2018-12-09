@@ -12,7 +12,7 @@ const execDir = process.cwd()
 import webpack from "webpack"
 
 module.exports = {
-  entry: "./src/index.tsx", // 入口文件
+  entry: ['babel-polyfill','./src/index.tsx'], // 入口文件
   output: {
     filename: "bundle.js", // 打包后的文件名称
     path: resolve("dist"), // 打包后的目录，必须是绝对路径

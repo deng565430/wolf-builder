@@ -24,6 +24,7 @@
     "babel-cli": "^6.26.0",
     "babel-loader": "^8.0.4",
     "babel-plugin-import": "^1.11.0",
+    "babel-polyfill": "^6.26.0",
     "clean-webpack-plugin": "^1.0.0",
     "commander": "^2.19.0",
     "copy-webpack-plugin": "^4.6.0",

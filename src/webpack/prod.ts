@@ -19,7 +19,7 @@ const execDir = process.cwd()
 import webpack from "webpack"
 
 module.exports = {
-  entry: "./src/index.tsx", // 入口文件
+  entry: ['babel-polyfill','./src/index.tsx'], // 入口文件
   output: {
     path: resolve("dist"), // 打包后的目录，必须是绝对路径
     chunkFilename: '[name].[hash].js',
@@ -93,7 +93,7 @@ module.exports = {
   // 提取公共代码
   optimization: {
     splitChunks: {
-      chunks: "initial",         // 必须三选一： "initial" | "all"(默认就是all) | "async"
+      chunks: "all",         // 必须三选一： "initial" | "all"(默认就是all) | "async"
       minSize: 0,                // 最小尺寸，默认0
       minChunks: 1,              // 最小 chunk ，默认1
       maxAsyncRequests: 1,       // 最大异步请求数， 默认1
@@ -128,7 +128,7 @@ module.exports = {
     }),
     require("autoprefixer"),
     new copyWebpackPlugin([{
-			from: resolve(__dirname,"src/assets"),
+			from: resolve(execDir,"./src/assets"),
 			to: './pulic'
 		}]),
     new MiniCssExtractPlugin({
