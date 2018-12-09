@@ -1,21 +1,26 @@
-import { resolve } from "path"
+import { join,resolve } from "path"
+import * as glob from "glob"
 import autoprefixer from 'autoprefixer'
 import commonLoaderRules from "./common"
-import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
 // 插件都是一个类，所以我们命名的时候尽量用大写开头
 import HtmlWebpackPlugin from "html-webpack-plugin"
 
-import ExtractTextWebpackPlugin from "extract-text-webpack-plugin"
+import ExtractTextPlugin from "extract-text-webpack-plugin"
 import CleanWebpackPlugin from "clean-webpack-plugin"
+import copyWebpackPlugin from "copy-webpack-plugin"
+
+//消除冗余的css
+import purifyCssWebpack from "purifycss-webpack"
 
 // 插件都是一个类，所以我们命名的时候尽量用大写开头
+
+const execDir = process.cwd()
 
 import webpack from "webpack"
 
 module.exports = {
   entry: "./src/index.tsx", // 入口文件
   output: {
-    filename: "bundle.js", // 打包后的文件名称
     path: resolve("dist"), // 打包后的目录，必须是绝对路径
     chunkFilename: '[name].[hash].js',
   },
@@ -38,19 +43,40 @@ module.exports = {
         exclude: /node_modules/
       },
       {
+				test: /\.js$/,
+				use: ['babel-loader'],
+				// 不检查node_modules下的js文件
+				exclude: '/node_modules/'
+      },
+      {
+				test: /\.html$/,
+				// html中的img标签
+				use: ["html-withimg-loader"]
+      },
+      {
+        test: /\.css$/,
+        use: ExtractTextPlugin.extract({
+					fallback: "style-loader",
+					use: ["css-loader", "postcss-loader"]
+				})
+      },
+      {
         test: /\.scss|.css$/,
-        use: [
-          { loader: 'style-loader', options: { sourceMap: true } },
-          { loader: 'css-loader', options: { sourceMap: true } },
-          {
-            loader: 'postcss-loader',
-            options: {
-              sourceMap: true,
-              plugins: () => [autoprefixer()],
+        use: ExtractTextPlugin.extract({
+          use: [
+            { loader: 'style-loader', options: { sourceMap: true } },
+            { loader: 'css-loader', options: { sourceMap: true } },
+            {
+              loader: 'postcss-loader',
+              options: {
+                sourceMap: true,
+                plugins: () => [autoprefixer()],
+              },
             },
-          },
-          { loader: 'resolve-url-loader', options: { sourceMap: true, keepQuery: true } }
-        ],
+            { loader: 'resolve-url-loader', options: { sourceMap: true, keepQuery: true } }
+          ],
+        })
+
       }
     ]
   },
@@ -82,9 +108,7 @@ module.exports = {
   },
   plugins: [
     // 打包前先清空
-    new CleanWebpackPlugin("dist"),
-    // 热替换，热替换不是刷新
-    new webpack.HotModuleReplacementPlugin(),
+    new CleanWebpackPlugin('/dist'),
     // 通过new一下这个类来使用插件
     new HtmlWebpackPlugin({
       // 用哪个html作为模板
@@ -92,20 +116,22 @@ module.exports = {
       template: "./src/index.html",
       hash: true // 会在打包好的bundle.js后面加上hash串
     }),
-    // 提取公共代码配置
-    new HtmlWebpackPlugin({
-      filename: "a.html",
-      template: "./src/index.html", // 以index.html为模板
-      chunks: ["vendor", "a"]
-    }),
-    new HtmlWebpackPlugin({
-      filename: "b.html",
-      template: "./src/index.html", // 以index.html为模板
-      chunks: ["vendor", "b"]
-    }),
     require("autoprefixer"),
+    new webpack.optimize.CommonsChunkPlugin({
+      name : 'common',
+      filename : 'js/base.js'
+    }),
+    new copyWebpackPlugin([{
+			from: resolve(__dirname,"src/assets"),
+			to: './pulic'
+		}]),
     // 拆分后会把css文件放到dist目录下的css/style.css
-    new ExtractTextWebpackPlugin("css/style.css")
+    new ExtractTextPlugin('css/[name].css'),
+    // 消除冗余的css代码
+		new purifyCssWebpack({
+			// glob为扫描模块，使用其同步方法（请谨慎使用异步方法）
+			paths: glob.sync(join(__dirname, "src/*.html"))
+		}),
   ], // 对应的插件
   mode: "production" // 生产模式
 };
