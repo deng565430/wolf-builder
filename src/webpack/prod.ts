@@ -5,7 +5,7 @@ import commonLoaderRules from "./common"
 // 插件都是一个类，所以我们命名的时候尽量用大写开头
 import HtmlWebpackPlugin from "html-webpack-plugin"
 
-import ExtractTextPlugin from "extract-text-webpack-plugin"
+import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import CleanWebpackPlugin from "clean-webpack-plugin"
 import copyWebpackPlugin from "copy-webpack-plugin"
 
@@ -55,15 +55,26 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: ExtractTextPlugin.extract({
-					fallback: "style-loader",
-					use: ["css-loader", "postcss-loader"]
-				})
+        use: [MiniCssExtractPlugin.loader,
+        {
+          loader: 'css-loader?importLoaders=1',
+          options: {
+            minimize: true //css压缩
+          }
+        },
+        {
+          loader: 'postcss-loader',
+          options: {
+            sourceMap: true,
+            plugins: () => [autoprefixer()],
+          },
+        },
+        ]
       },
       {
         test: /\.scss|.css$/,
-        use: ExtractTextPlugin.extract({
           use: [
+            MiniCssExtractPlugin.loader,
             { loader: 'style-loader', options: { sourceMap: true } },
             { loader: 'css-loader', options: { sourceMap: true } },
             {
@@ -74,8 +85,7 @@ module.exports = {
               },
             },
             { loader: 'resolve-url-loader', options: { sourceMap: true, keepQuery: true } }
-          ],
-        })
+          ]
 
       }
     ]
@@ -117,16 +127,14 @@ module.exports = {
       hash: true // 会在打包好的bundle.js后面加上hash串
     }),
     require("autoprefixer"),
-    new webpack.optimize.CommonsChunkPlugin({
-      name : 'common',
-      filename : 'js/base.js'
-    }),
     new copyWebpackPlugin([{
 			from: resolve(__dirname,"src/assets"),
 			to: './pulic'
 		}]),
-    // 拆分后会把css文件放到dist目录下的css/style.css
-    new ExtractTextPlugin('css/[name].css'),
+    new MiniCssExtractPlugin({
+      filename: "[name].css",
+      chunkFilename: "[id].css"
+    }),
     // 消除冗余的css代码
 		new purifyCssWebpack({
 			// glob为扫描模块，使用其同步方法（请谨慎使用异步方法）
