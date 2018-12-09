@@ -4,6 +4,7 @@ import commonLoaderRules from "./common"
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
 // 插件都是一个类，所以我们命名的时候尽量用大写开头
 import HtmlWebpackPlugin from "html-webpack-plugin"
+import tsImportPluginFactory from "ts-import-plugin"
 
 const execDir = process.cwd()
 
@@ -30,7 +31,13 @@ module.exports = {
           {
             loader: 'ts-loader',
             options: {
-              transpileOnly: true
+              transpileOnly: true,
+              getCustomTransformers: () => ({
+                before: [ tsImportPluginFactory( /** options */) ]
+              }),
+              compilerOptions: {
+                module: 'es2015'
+              }
             }
           }
         ],
@@ -80,7 +87,6 @@ module.exports = {
     }
   },
   plugins: [
-    ["import", { libraryName: "antd", style: "css" }],
     // 通过new一下这个类来使用插件
     new HtmlWebpackPlugin({
       // 用哪个html作为模板

@@ -9,6 +9,8 @@ import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import CleanWebpackPlugin from "clean-webpack-plugin"
 import copyWebpackPlugin from "copy-webpack-plugin"
 
+import tsImportPluginFactory from "ts-import-plugin"
+
 //消除冗余的css
 import purifyCssWebpack from "purifycss-webpack"
 
@@ -36,8 +38,14 @@ module.exports = {
           {
             loader: 'ts-loader',
             options: {
-              transpileOnly: true
-            }
+              transpileOnly: true,
+              getCustomTransformers: () => ({
+                before: [ tsImportPluginFactory( /** options */) ]
+              }),
+              compilerOptions: {
+                module: 'es2015'
+              }
+            },
           }
         ],
         exclude: /node_modules/
