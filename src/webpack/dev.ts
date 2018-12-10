@@ -34,7 +34,7 @@ module.exports = {
             before: [ tsImportPluginFactory({
               libraryName: 'antd',
               libraryDirectory: 'lib',
-              style: true
+              style: 'css'
             })]
           }),
           compilerOptions: {

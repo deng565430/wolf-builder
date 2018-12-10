@@ -10,6 +10,7 @@ import copyWebpackPlugin from "copy-webpack-plugin"
 
 import UglifyJsPlugin from 'uglifyjs-webpack-plugin'
 import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
+import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 
 const tsImportPluginFactory = require('ts-import-plugin')
 
@@ -43,7 +44,7 @@ module.exports = {
             before: [ tsImportPluginFactory({
               libraryName: 'antd',
               libraryDirectory: 'lib',
-              style: true
+              style: 'css'
             })]
           }),
           compilerOptions: {
@@ -67,6 +68,14 @@ module.exports = {
         test: /\.scss|.css$/,
           use: [
             { loader: 'style-loader', options: { sourceMap: true } },
+            {
+              loader: MiniCssExtractPlugin.loader,
+              options: {
+                // you can specify a publicPath here
+                // by default it use publicPath in webpackOptions.output
+                publicPath: '../'
+              }
+            },
             { loader: 'css-loader', options: { sourceMap: true } },
             {
               loader: 'postcss-loader',
@@ -83,6 +92,9 @@ module.exports = {
   },
   // 提取公共代码
   optimization: {
+    runtimeChunk: {
+      name: 'manifest'
+    },
     minimizer: [
       new UglifyJsPlugin({
         cache: true,
@@ -104,7 +116,7 @@ module.exports = {
       },              // 名称，此选项课接收 function
       cacheGroups: {                 // 这里开始设置缓存的 chunks
         styles: {
-          name: '[name]',
+          name: 'styles',
           test: /\.(scss|css)$/,
           chunks: 'all',
           minChunks: 1,
@@ -155,7 +167,13 @@ module.exports = {
 		new purifyCssWebpack({
 			// glob为扫描模块，使用其同步方法（请谨慎使用异步方法）
 			paths: glob.sync(join(__dirname, "src/*.html"))
-		}),
+    }),
+    new MiniCssExtractPlugin({
+      // Options similar to the same options in webpackOptions.output
+      // both options are optional
+      filename: '[name].[hash].css',
+      chunkFilename: '[id].[hash].css',
+    })
   ], // 对应的插件
   mode: "production" // 生产模式
 };
