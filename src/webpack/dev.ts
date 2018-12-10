@@ -26,21 +26,21 @@ module.exports = {
     rules:[
       ...commonLoaderRules,
       {
-        test: /\.tsx?$/,
-        use: [
-          {
-            loader: 'ts-loader',
-            options: {
-              transpileOnly: true,
-              getCustomTransformers: () => ({
-                before: [ tsImportPluginFactory( /** options */) ]
-              }),
-              compilerOptions: {
-                module: 'es2015'
-              }
-            }
+        test: /\.(jsx|tsx|js|ts)$/,
+        loader: 'ts-loader',
+        options: {
+          transpileOnly: true,
+          getCustomTransformers: () => ({
+            before: [ tsImportPluginFactory({
+              libraryName: 'antd',
+              libraryDirectory: 'lib',
+              style: true
+            })]
+          }),
+          compilerOptions: {
+            module: 'es2015'
           }
-        ],
+        },
         exclude: /node_modules/
       },
       {
@@ -91,9 +91,11 @@ module.exports = {
       // 在src目录下创建一个index.html页面当做模板来用
       template: "./src/index.html"
     }),
+    new webpack.NamedModulesPlugin(),
     // 热替换，热替换不是刷新
     new webpack.HotModuleReplacementPlugin(),
     new TsconfigPathsPlugin({configFile: resolve(execDir, './tsconfig.json')}),
+    new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /nb/)
   ], // 对应的插件
   devServer: {
     contentBase: "./dist",

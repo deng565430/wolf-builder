@@ -9,7 +9,6 @@ import CleanWebpackPlugin from "clean-webpack-plugin"
 import copyWebpackPlugin from "copy-webpack-plugin"
 
 import UglifyJsPlugin from 'uglifyjs-webpack-plugin'
-import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
 
 const tsImportPluginFactory = require('ts-import-plugin')
@@ -36,21 +35,21 @@ module.exports = {
     rules:[
       ...commonLoaderRules,
       {
-        test: /\.tsx?$/,
-        use: [
-          {
-            loader: 'ts-loader',
-            options: {
-              transpileOnly: true,
-              getCustomTransformers: () => ({
-                before: [ tsImportPluginFactory( /** options */) ]
-              }),
-              compilerOptions: {
-                module: 'es2015'
-              }
-            },
+        test: /\.(jsx|tsx|js|ts)$/,
+        loader: 'ts-loader',
+        options: {
+          transpileOnly: true,
+          getCustomTransformers: () => ({
+            before: [ tsImportPluginFactory({
+              libraryName: 'antd',
+              libraryDirectory: 'lib',
+              style: true
+            })]
+          }),
+          compilerOptions: {
+            module: 'es2015'
           }
-        ],
+        },
         exclude: /node_modules/
       },
       {
@@ -67,9 +66,6 @@ module.exports = {
       {
         test: /\.scss|.css$/,
           use: [
-            {
-              loader: MiniCssExtractPlugin.loader
-            },
             { loader: 'style-loader', options: { sourceMap: true } },
             { loader: 'css-loader', options: { sourceMap: true } },
             {
@@ -102,13 +98,13 @@ module.exports = {
       chunks: "all",         // 必须三选一： "initial" | "all"(默认就是all) | "async"
       minSize: 0,                // 最小尺寸，默认0
       minChunks: 1,              // 最小 chunk ，默认1
-      maxAsyncRequests: 1,       // 最大异步请求数， 默认1
-      maxInitialRequests: 1,    // 最大初始化请求书，默认1
+      maxAsyncRequests: 5,       // 最大异步请求数， 默认1
+      maxInitialRequests: 3,    // 最大初始化请求书，默认1
       name: () => {
       },              // 名称，此选项课接收 function
       cacheGroups: {                 // 这里开始设置缓存的 chunks
         styles: {
-          name: 'styles',
+          name: '[name]',
           test: /\.(scss|css)$/,
           chunks: 'all',
           minChunks: 1,
@@ -131,6 +127,15 @@ module.exports = {
       }
     }
   },
+  performance: {
+    hints: "warning", // 枚举
+    maxAssetSize: 200000, // 整数类型（以字节为单位）
+    maxEntrypointSize: 400000, // 整数类型（以字节为单位）
+    assetFilter: function(assetFilename) {
+      // 提供资源文件名的断言函数
+      return assetFilename.endsWith('.css') || assetFilename.endsWith('.js');
+    }
+  },
   plugins: [
     // 打包前先清空
     new CleanWebpackPlugin('/dist'),
@@ -146,10 +151,6 @@ module.exports = {
 			from: resolve(execDir,"./src/assets"),
 			to: './pulic'
 		}]),
-    new MiniCssExtractPlugin({
-      filename: 'css/app.[name].css',
-      chunkFilename: 'css/app.[contenthash:12].css'
-    }),
     // 消除冗余的css代码
 		new purifyCssWebpack({
 			// glob为扫描模块，使用其同步方法（请谨慎使用异步方法）
