@@ -5,9 +5,12 @@ import commonLoaderRules from "./common"
 // 插件都是一个类，所以我们命名的时候尽量用大写开头
 import HtmlWebpackPlugin from "html-webpack-plugin"
 
-import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import CleanWebpackPlugin from "clean-webpack-plugin"
 import copyWebpackPlugin from "copy-webpack-plugin"
+
+import UglifyJsPlugin from 'uglifyjs-webpack-plugin'
+import MiniCssExtractPlugin from "mini-css-extract-plugin"
+import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
 
 const tsImportPluginFactory = require('ts-import-plugin')
 
@@ -62,27 +65,6 @@ module.exports = {
 				use: ["html-withimg-loader"]
       },
       {
-        test: /\.css$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader
-          },
-        {
-          loader: 'css-loader?importLoaders=1',
-          options: {
-            minimize: true //css压缩
-          }
-        },
-        {
-          loader: 'postcss-loader',
-          options: {
-            sourceMap: true,
-            plugins: () => [autoprefixer()],
-          },
-        },
-        ]
-      },
-      {
         test: /\.scss|.css$/,
           use: [
             {
@@ -105,6 +87,17 @@ module.exports = {
   },
   // 提取公共代码
   optimization: {
+    minimizer: [
+      new UglifyJsPlugin({
+        cache: true,
+        parallel: true,
+        sourceMap: true, // set to true if you want JS source maps,
+        uglifyOptions: {
+          warnings: false
+        }
+      }),
+      new OptimizeCSSAssetsPlugin({}),
+    ],
     splitChunks: {
       chunks: "all",         // 必须三选一： "initial" | "all"(默认就是all) | "async"
       minSize: 0,                // 最小尺寸，默认0
@@ -114,17 +107,26 @@ module.exports = {
       name: () => {
       },              // 名称，此选项课接收 function
       cacheGroups: {                 // 这里开始设置缓存的 chunks
+        styles: {
+          name: 'styles',
+          test: /\.(scss|css)$/,
+          chunks: 'all',
+          minChunks: 1,
+          reuseExistingChunk: true,
+          enforce: true
+        },
         priority: "0",                // 缓存组优先级 false | object |
         vendor: {                   // key 为entry中定义的 入口名称
           chunks: "initial",        // 必须三选一： "initial" | "all" | "async"(默认就是异步)
-          test: /react|lodash/,     // 正则规则验证，如果符合就提取 chunk
           name: "vendor",           // 要缓存的 分隔出来的 chunk 名称
           minSize: 0,
           minChunks: 1,
           enforce: true,
           maxAsyncRequests: 1,       // 最大异步请求数， 默认1
           maxInitialRequests: 1,    // 最大初始化请求书，默认1
-          reuseExistingChunk: true   // 可设置是否重用该chunk（查看源码没有发现默认值）
+          reuseExistingChunk: false,   // 可设置是否重用该chunk（查看源码没有发现默认值）
+          priority: -10,
+          test: /node_modules\/(.*)\.js/, // 正则规则验证，如果符合就提取 chunk
         }
       }
     }
@@ -145,8 +147,8 @@ module.exports = {
 			to: './pulic'
 		}]),
     new MiniCssExtractPlugin({
-      filename: "[name].css",
-      chunkFilename: "[id].css"
+      filename: 'css/app.[name].css',
+      chunkFilename: 'css/app.[contenthash:12].css'
     }),
     // 消除冗余的css代码
 		new purifyCssWebpack({
