@@ -83,9 +83,6 @@ module.exports = {
       }
     }
   },
-  performance: {
-    hints: true
-  },
   plugins: [
     // 通过new一下这个类来使用插件
     new HtmlWebpackPlugin({
