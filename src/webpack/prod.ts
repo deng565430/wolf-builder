@@ -27,7 +27,8 @@ module.exports = {
   entry: ['babel-polyfill','./src/index.tsx'], // 入口文件
   output: {
     path: resolve("dist"), // 打包后的目录，必须是绝对路径
-    chunkFilename: '[name].[hash].js',
+    filename: '[name].[chunkhash:8].js',
+    chunkFilename: '[name].[chunkHash:8].js',
   },
   resolve: {
     extensions: ['.webpack.js', '.ts', '.tsx', '.js', '.css', '.scss'],
@@ -115,26 +116,24 @@ module.exports = {
       name: () => {
       },              // 名称，此选项课接收 function
       cacheGroups: {                 // 这里开始设置缓存的 chunks
-        styles: {
-          name: 'styles',
-          test: /\.(scss|css)$/,
-          chunks: 'all',
-          minChunks: 1,
-          reuseExistingChunk: true,
-          enforce: true
+        common: {
+          chunks: "initial",
+           name: "common",
+           minChunks: 2,
+           maxInitialRequests: 5,
+           minSize: 0
         },
-        priority: "0",                // 缓存组优先级 false | object |
         vendor: {                   // key 为entry中定义的 入口名称
-          chunks: "initial",        // 必须三选一： "initial" | "all" | "async"(默认就是异步)
+          chunks: "all",        // 必须三选一： "initial" | "all" | "async"(默认就是异步)
           name: "vendor",           // 要缓存的 分隔出来的 chunk 名称
           minSize: 0,
           minChunks: 1,
           enforce: true,
-          maxAsyncRequests: 1,       // 最大异步请求数， 默认1
-          maxInitialRequests: 1,    // 最大初始化请求书，默认1
+          maxAsyncRequests: 5,       // 最大异步请求数， 默认1
+          maxInitialRequests: 5,    // 最大初始化请求书，默认1
           reuseExistingChunk: false,   // 可设置是否重用该chunk（查看源码没有发现默认值）
-          priority: -10,
-          test: /node_modules\/(.*)\.js/, // 正则规则验证，如果符合就提取 chunk
+          priority: -1,
+          test: /node_modules/, // 正则规则验证，如果符合就提取 chunk
         }
       }
     }
@@ -159,10 +158,10 @@ module.exports = {
       hash: true // 会在打包好的bundle.js后面加上hash串
     }),
     require("autoprefixer"),
-    new copyWebpackPlugin([{
-			from: resolve(execDir,"./src/assets"),
-			to: './pulic'
-		}]),
+    // new copyWebpackPlugin([{
+		// 	from: resolve(execDir,"./src/assets"),
+		// 	to: './pulic'
+		// }]),
     // 消除冗余的css代码
 		new purifyCssWebpack({
 			// glob为扫描模块，使用其同步方法（请谨慎使用异步方法）
@@ -171,8 +170,8 @@ module.exports = {
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
       // both options are optional
-      filename: '[name].[hash].css',
-      chunkFilename: '[id].[hash].css',
+      filename: 'css/[name].[hash].css',
+      chunkFilename: 'css/[id].[hash].css',
     })
   ], // 对应的插件
   mode: "production" // 生产模式
