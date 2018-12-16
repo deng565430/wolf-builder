@@ -12,10 +12,10 @@ import UglifyJsPlugin from 'uglifyjs-webpack-plugin'
 import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 
-// 去除没有用到的多余代码
-import WebpackDeepScopeAnalysisPlugin from 'webpack-deep-scope-plugin'
 
 const tsImportPluginFactory = require('ts-import-plugin')
+// 去除没有用到的多余代码
+const WebpackDeepScopeAnalysisPlugin = require('webpack-deep-scope-plugin').default
 
 //消除冗余的css
 import purifyCssWebpack from "purifycss-webpack"
