@@ -6,18 +6,23 @@ import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
 import HtmlWebpackPlugin from "html-webpack-plugin"
 const tsImportPluginFactory = require('ts-import-plugin')
 
+import setIterm2Badeg from "set-iterm2-badge"
+
+
 const execDir = process.cwd()
 
 // 插件都是一个类，所以我们命名的时候尽量用大写开头
 
 import webpack from "webpack"
 
+setIterm2Badeg('开发环境')
+
 module.exports = {
   entry: ['babel-polyfill','./src/index.tsx'], // 入口文件
   output: {
     filename: "bundle.js", // 打包后的文件名称
     path: resolve("dist"), // 打包后的目录，必须是绝对路径
-    chunkFilename: '[name].[hash].js',
+    chunkFilename: '[name].bundle.js',
   },
   resolve: {
     extensions: ['.webpack.js', '.ts', '.tsx', '.js', '.css', '.scss'],

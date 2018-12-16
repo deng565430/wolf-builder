@@ -12,6 +12,9 @@ import UglifyJsPlugin from 'uglifyjs-webpack-plugin'
 import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 
+// 去除没有用到的多余代码
+import WebpackDeepScopeAnalysisPlugin from 'webpack-deep-scope-plugin'
+
 const tsImportPluginFactory = require('ts-import-plugin')
 
 //消除冗余的css
@@ -68,7 +71,7 @@ module.exports = {
       {
         test: /\.scss|.css$/,
           use: [
-            { loader: 'style-loader', options: { sourceMap: true } },
+            // { loader: 'style-loader', options: { sourceMap: true } },
             {
               loader: MiniCssExtractPlugin.loader,
               options: {
@@ -77,6 +80,7 @@ module.exports = {
                 publicPath: '../'
               }
             },
+            // { loader: 'css-loader?modules&localIdentName=[name]_[local]-[hash:base64:5]', options: { sourceMap: true } },
             { loader: 'css-loader', options: { sourceMap: true } },
             {
               loader: 'postcss-loader',
@@ -161,17 +165,18 @@ module.exports = {
     // new copyWebpackPlugin([{
 		// 	from: resolve(execDir,"./src/assets"),
 		// 	to: './pulic'
-		// }]),
+    // }]),
+    new WebpackDeepScopeAnalysisPlugin(),
     // 消除冗余的css代码
 		new purifyCssWebpack({
 			// glob为扫描模块，使用其同步方法（请谨慎使用异步方法）
-			paths: glob.sync(join(__dirname, "src/*.html"))
+			paths: glob.sync(join(__dirname, "./dist/*.html"))
     }),
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
       // both options are optional
-      filename: 'css/[name].[hash].css',
-      chunkFilename: 'css/[id].[hash].css',
+      filename: 'css/[name].[hash:8].css',
+      chunkFilename: 'css/[id].[hash:8].css',
     })
   ], // 对应的插件
   mode: "production" // 生产模式
