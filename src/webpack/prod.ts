@@ -168,10 +168,10 @@ module.exports = {
     // }]),
     new WebpackDeepScopeAnalysisPlugin(),
     // 消除冗余的css代码
-		new purifyCssWebpack({
-			// glob为扫描模块，使用其同步方法（请谨慎使用异步方法）
-			paths: glob.sync(join(__dirname, "./dist/*.html"))
-    }),
+		// new purifyCssWebpack({
+		// 	// glob为扫描模块，使用其同步方法（请谨慎使用异步方法）
+		// 	paths: glob.sync(join(__dirname, "./dist/*.html"))
+    // }),
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
       // both options are optional
